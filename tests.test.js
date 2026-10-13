@@ -52,3 +52,14 @@ test('Story is complete, sequenced and links each scene to the next',async()=>{
  assert.doesNotMatch(html,/scan another|Scan a workshop/);
  }
 });
+
+test('Preview actions stay separate from verdicts and preserve privacy',async()=>{
+ const {runInNewContext}=await import('node:vm');const handlers={};let html='';const notice={textContent:''};
+ const app={set innerHTML(value){html=value},querySelectorAll(){return []},querySelector(selector){return selector==='.preview-notice'?notice:null},addEventListener(name,fn){handlers[name]=fn}};
+ const source=(await readFile('app.js','utf8')).replace(/import .*?;\r?\n/,'');const sandbox={scenarios,choices,document:{querySelector(selector){return selector==='#app'?app:null}},location:{pathname:'/challenge/expected-sign-in',origin:'https://workshop.example'},window:{addEventListener(){},scrollTo(){}},history:{pushState(){}}};runInNewContext(source,sandbox);
+ const click=dataset=>handlers.click({target:{closest(selector){return selector==='button'?{dataset,disabled:false}:null}}});
+ assert.match(html,/arriving/);click({preview:'approve'});assert.match(notice.textContent,/No real sign-in/);assert.doesNotMatch(html,/YOUR TAKE-HOME HABIT|data-warning/);
+ click({preview:'replay'});assert.match(html,/arriving/);assert.match(html,/What do you notice/);
+ sandbox.location.pathname='/challenge/confirmed-class-update';runInNewContext(source,{...sandbox});click({mail:'course'});assert.match(html,/SEPARATE SAMPLE/);assert.match(html,/Room 204/);assert.doesNotMatch(html,/data-warning/);click({mail:'scenario'});assert.match(html,/Morgan/);click({preview:'delete'});assert.match(notice.textContent,/no real email was deleted/);
+ const css=await readFile('workshop.css','utf8');assert.match(css,/prefers-reduced-motion:reduce/);assert.match(css,/notification-arrive/);
+});
