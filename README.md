@@ -1,5 +1,5 @@
 # Puma Patrol
-https://yannixeno.github.io/Valencia-digital-self-defense-lab/
+Link to website: https://yannixeno.github.io/Valencia-digital-self-defense-lab/
 
 An interactive digital safety workshop by the Valencia College Cyber Defense Club.
 
