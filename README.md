@@ -1,37 +1,35 @@
-# Digital Self-Defense
+# Digital Self-Defense workshop
 
-Interactive workshop prototype for Valencia College Cyber Defense Club. November 6, 2026 · Poinciana Campus.
+Valencia College Cyber Defense Club · November 6, 2026 · Poinciana Campus.
+
+The physical room drives the experience. Students scan a flyer or laminated card, inspect its fictional message, share their reasoning, and choose a practical action. There is no catalog on the welcome page, prescribed scenario order, score, or completion requirement.
 
 ## Local demo
 
-Requires Node.js 24. No dependency installation needed.
+Node.js 24; no dependencies to install. Run `npm start`, then open http://localhost:3000. Phones on the same Wi-Fi can use your computer’s LAN IP and port if your firewall and Wi-Fi permit it.
 
-```sh
-npm start
-```
+## Routes and hosting
 
-Open http://localhost:3000. On phones connected to the same Wi-Fi, use http://YOUR-COMPUTER-LAN-IP:3000 (your firewall must permit the server). Campus Wi-Fi may isolate devices; hosted Pages is preferable for the event.
+`/` welcomes students with STOP → CHECK → PROTECT and invites them to scan a workshop item. `/challenge/SCENARIO-ID/` opens an item directly. `/complete/` reinforces the habit and sends students back to the room. `/facilitator/` lists all items for staff, including printable card labels, URLs, questions, takeaways, and time estimates. The facilitator page is public educational material, not an authenticated dashboard.
 
-## GitHub Pages
+GitHub Pages: repository Settings → Pages → Source → GitHub Actions. The included workflow tests and builds on main, then deploys dist. Pull requests test/build without deploying. `npm run build` generates an index.html for every route. Set BASE_PATH to /REPOSITORY for a manual project-URL build. Existing QR destinations remain unchanged.
 
-Put the contents of this folder at the repository root. The workflow expects the main branch. Under Settings → Pages, choose GitHub Actions as the source. Push to main or run “Deploy workshop to GitHub Pages.” Pull requests test and build without deployment. For a different default branch, update both workflow branch lists.
+## Scenario authoring
 
-The build reads the Pages base path and generates a real index.html for every challenge, completion, and facilitator route. QR links such as https://OWNER.github.io/REPOSITORY/challenge/qr-free-food/ load directly, including refreshes. Use the facilitator page on the deployed site to get the final URLs before generating and laminating QR cards. It prints destinations, not actual QR graphics.
+Edit scenarios.js. Core message fields describe the artifact. The workshopDetails object is keyed by the same scenario id and provides label, question, clue, practical actions, and recovery. Each action is [label, safest boolean, explanation]. Include one safest action and explanations for all alternatives. Recovery is an array of short steps; use an empty array when it is not applicable. Estimates default to 2–3 minutes. New scenario ids also need a matching workshopDetails entry; tests check this. Rebuild to generate the new static URL.
 
-Manual static build: `node build.js`. For a project Pages URL, set BASE_PATH to /REPOSITORY before running the build. Upload only dist, never the Node development server.
+Message types: offer (flyer), email (inbox), social (DM), sms (phone thread), mfa (push notification), login (static sign-in preview). Each has tap-to-expand clues. A student must inspect at least one clue and choose a verdict before reflection; at least one reflection before reveal; and an action before its explanation. Warnings are revealed only after reflection. Native details controls support keyboard and touch. Internal stage navigation focuses its heading.
 
-## Edit scenarios
+## Physical setup
 
-Edit scenarios.js: id, title, category, type (offer/email/social/sms/mfa/login), context, sender, detail, headline, body, url, cta, answer (safe/suspicious/more), flags (title/explanation pairs), check (reflection options), protect. Additions appear in the collection automatically; rebuild to generate their direct static routes.
+Use the deployed facilitator page to get final URLs. Print its staff sheet and copy its short labels onto physical cards. Generate QR graphics from those URLs separately. Students can start anywhere. Ask the suggested discussion question when they return to the room. Do not place the facilitator answer sheet among student artifacts.
 
-## Interaction and privacy
+## Privacy and safety
 
-Choose a verdict → select what you would check → reveal → next challenge. There is no score or timer. The completion count stores only scenario IDs and completion booleans in sessionStorage. Responses and reflection selections are memory-only. Closing the tab normally clears session progress. Reset is available on the completion screen. No analytics, backend, identity tracking, or aggregate collection. All messages use sample data and reserved .example domains. Login previews have fixed sample fields, no editable inputs, forms, or authentication. Preview buttons and URLs are inactive.
+No backend, analytics, response submission, or participant tracking. Choices and clue state are held only in memory and disappear on refresh/navigation. No browser storage is used. No editable credential, identity, payment, or free-text fields exist. Reflection checkboxes are predefined. Login identities/passwords are fixed display text. Simulated links and message action buttons are inert; domains use reserved .example addresses. The app has no authentication functionality and never opens simulated destinations.
 
-Google Fonts is used for typography, with local system-font fallbacks. This requests fonts from Google; self-host or remove the CSS import for a fully offline demo. GitHub Pages infrastructure can retain ordinary hosting request logs; the app itself collects no personal data.
+Google Fonts is loaded for typography with system-font fallbacks; remove the font import for a fully offline demo. GitHub Pages can retain ordinary hosting request logs; the app does not collect participant data.
 
-## Checks
+## Verification
 
-`npm test` checks scenario integrity, fictional domains, reflection gating, and absence of credential entry/network response code. Browser QA should cover phone widths, keyboard navigation, direct links and refresh, all verdicts, reflection gating, completion/reset, and the Pages base path.
-
-This is an educational prototype, not an official college login service. Verify event details and content with the club before printing or publishing.
+`npm test` checks content, recovery, action explanations, privacy boundaries, and progression gates. `node --check app.js` checks syntax. Browser checks cover clue gating, reflection, safe/unsafe practical-action feedback, recovery, direct-route refresh, mobile layout, and facilitator printing. Avoid collecting student data in testing.

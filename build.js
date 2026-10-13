@@ -5,7 +5,8 @@ if(base && !/^\/[A-Za-z0-9_.-]+$/.test(base)) throw new Error('BASE_PATH must be
 let html=await readFile('index.html','utf8');
 html=html.replace('<head>',`<head><meta name="app-base" content="${base}">`).replace('href="/styles.css"',`href="${base}/styles.css"`).replace('src="/app.js"',`src="${base}/app.js"`);
 await mkdir('dist',{recursive:true});
-for(const name of ['app.js','scenarios.js','styles.css'])await copyFile(name,`dist/${name}`);
+html=html.replace('href="/workshop.css"',`href="${base}/workshop.css"`);
+for(const name of ['app.js','scenarios.js','styles.css','workshop.css'])await copyFile(name,`dist/${name}`);
 await writeFile('dist/index.html',html);
 await writeFile('dist/404.html',html);
 await writeFile('dist/.nojekyll','');
