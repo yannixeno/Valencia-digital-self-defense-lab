@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {scenarios,choices} from './scenarios.js';
-test('Every QR destination has complete reflection and reveal content',()=>{
+test('Every story scene has complete reflection and reveal content',()=>{
   assert.ok(scenarios.length>=5);assert.equal(new Set(scenarios.map(s=>s.id)).size,scenarios.length);
   for(const s of scenarios){assert.match(s.id,/^[a-z0-9-]+$/);assert.ok(choices[s.answer]);assert.ok(s.flags.length);assert.ok(s.check.length);assert.ok(s.protect);if(s.url)assert.ok(s.url.endsWith('.example'))}
 });
@@ -37,4 +37,18 @@ test('Direct entry and full decision flow render without an intro or answer leak
  click({action:'act'});assert.match(html,/What would you actually do/);click({action:'done'});assert.doesNotMatch(html,/YOUR TAKE-HOME HABIT/);
  click({practical:'0'});click({action:'done'});assert.match(html,/YOUR TAKE-HOME HABIT/);
  for(const item of scenarios){sandbox.location.pathname='/challenge/'+item.id;runInNewContext(source,{...sandbox});assert.doesNotMatch(html,/undefined|Open this item/);assert.match(html,/data-clue/)}
+});
+
+test('Story is complete, sequenced and links each scene to the next',async()=>{
+ assert.equal(scenarios[0].id,'expected-sign-in');assert.equal(scenarios.at(-1).id,'club-announcement');
+ const source=(await readFile('app.js','utf8')).replace(/import .*?;\r?\n/,'');const {runInNewContext}=await import('node:vm');let html='';
+ const app={set innerHTML(value){html=value},querySelectorAll(){return []},querySelector(){return null},addEventListener(){}};
+ for(let i=0;i<scenarios.length;i++){
+ const scene=scenarios[i];for(const field of ['storyTime','chapter','intro','bridge'])assert.ok(scene[field]);
+ const sandbox={scenarios,choices,document:{querySelector(selector){return selector==='#app'?app:null}},location:{pathname:'/challenge/'+scene.id,origin:'https://workshop.example'},window:{addEventListener(){},scrollTo(){}},history:{pushState(){}}};
+ runInNewContext(source+";stage='done';actionIndex=0;render();",sandbox);
+ assert.match(html,new RegExp('Moment '+(i+1)+' of '+scenarios.length));assert.ok(html.includes(scene.bridge));
+ assert.ok(html.includes(i<scenarios.length-1?'href=\"/challenge/'+scenarios[i+1].id+'/\"':'href=\"/complete\"'));
+ assert.doesNotMatch(html,/scan another|Scan a workshop/);
+ }
 });
