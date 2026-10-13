@@ -1,1 +1,1 @@
-{"name":"valencia-digital-self-defense","private":true,"type":"module","scripts":{"start":"node server.js","build":"node build.js","test":"node --test tests.test.js"}}
+{"name":"valencia-digital-self-defense","private":true,"type":"module","scripts":{"start":"node server.js","build":"node build.js","test":"node --check app.js && node --test tests.test.js"}}

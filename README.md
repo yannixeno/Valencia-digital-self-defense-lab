@@ -4,6 +4,10 @@ Valencia College Cyber Defense Club · November 6, 2026 · Poinciana Campus.
 
 The physical room drives the experience. Students scan a flyer or laminated card, inspect its fictional message, share their reasoning, and choose a practical action. There is no catalog on the welcome page, prescribed scenario order, score, or completion requirement.
 
+Each item opens with a brief scene card, followed by Look → Think → Discover → Choose → Take it with you. Previous-step controls preserve choices only while the item is open. Tap “Show me” on a warning to expand its explanation and highlight the relevant message or clue. A colored habit card concludes the item before students return to the physical workshop. Motion respects reduced-motion settings. All email scenarios use the shared Valencia-style simulated inbox.
+
+Design references: [Jigsaw Phishing Quiz](https://phishingquiz.withgoogle.com/) for focused inspection and progressive reveals, and [Be Internet Awesome](https://beinternetawesome.withgoogle.com/en_us) for distinct visual themes and practice through interaction. No source code, assets, or branding from those references is included; no name/email setup is used.
+
 ## Local demo
 
 Node.js 24; no dependencies to install. Run `npm start`, then open http://localhost:3000. Phones on the same Wi-Fi can use your computer’s LAN IP and port if your firewall and Wi-Fi permit it.
