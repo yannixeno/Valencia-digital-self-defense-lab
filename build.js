@@ -1,4 +1,4 @@
-import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
+import {cp,mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
 import {scenarios} from './scenarios.js';
 import {createHash} from 'node:crypto';
 const base=(process.env.BASE_PATH||'').replace(/\/$/,'');
@@ -14,6 +14,7 @@ html=html.replaceAll('/styles.css"',`/styles.css?v=${version}"`).replaceAll('/wo
 await writeFile('dist/index.html',html);
 await writeFile('dist/404.html',html);
 await writeFile('dist/.nojekyll','');
-for(const route of [...scenarios.map(s=>`challenge/${s.id}`),'complete','facilitator']){await mkdir(`dist/${route}`,{recursive:true});await writeFile(`dist/${route}/index.html`,html)}
+for(const route of [...scenarios.map(s=>`challenge/${s.id}`),'complete','facilitator','cards']){await mkdir(`dist/${route}`,{recursive:true});await writeFile(`dist/${route}/index.html`,html)}
 console.log(`Built static site for ${base||'/'} with ${scenarios.length} direct challenge destinations.`);
 
+await cp('qr','dist/qr',{recursive:true});

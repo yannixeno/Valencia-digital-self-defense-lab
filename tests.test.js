@@ -14,8 +14,27 @@ test('Application has no credential entry fields or response transmission',async
   assert.match(source,/b.dataset.action==='reflect'&&choice&&inspected.size/);
   assert.match(source,/b.dataset.action==='reveal'&&reflections.size/);
   assert.match(source,/b.dataset.action==='done'&&actionIndex!==null/);
-  assert.match(source,/b.dataset.action==='begin'&&stage==='arrive'/);
+  assert.match(source,/let stage='inspect'/); assert.doesNotMatch(source,/reveal\|\|inspected.has/);
 });
 test('Every workshop item has facilitator details and explained practical choices',()=>{
   for(const s of scenarios){assert.ok(s.label&&s.question&&s.clue&&s.time);assert.equal(s.actions.filter(a=>a[1]).length,1);assert.ok(s.actions.length>=3);for(const a of s.actions)assert.ok(a[0]&&a[2]);assert.ok(Array.isArray(s.recovery));if(s.answer==='suspicious')assert.ok(s.recovery.length)}
+});
+
+test('Workshop includes legitimate context and independent event verification',()=>{assert.ok(scenarios.some(s=>s.answer==='safe'));assert.ok(scenarios.some(s=>s.answer==='more'));const expected=scenarios.find(s=>s.id==='expected-sign-in');assert.equal(expected.matchingNumber,'42');assert.ok(scenarios.find(s=>s.id==='club-announcement').calendar)});
+
+test('Direct entry and full decision flow render without an intro or answer leak',async()=>{
+ const {runInNewContext}=await import('node:vm'); const handlers={};let html='';
+ const app={set innerHTML(value){html=value},get innerHTML(){return html},querySelectorAll(){return []},querySelector(){return null},addEventListener(name,fn){handlers[name]=fn}};
+ const source=(await readFile('app.js','utf8')).replace(/import .*?;\r?\n/,'');
+ let reflectButton={disabled:true},revealButton={disabled:true},doneButton={disabled:true};app.querySelector=selector=>selector.includes('reflect')?reflectButton:selector.includes('reveal')?revealButton:selector.includes('done')?doneButton:null;
+ const sandbox={scenarios,choices,document:{querySelector(selector){return selector==='#app'?app:null}},location:{pathname:'/challenge/club-announcement',origin:'https://workshop.example'},window:{addEventListener(){},scrollTo(){}},history:{pushState(){}}};
+ runInNewContext(source,sandbox);assert.match(html,/Campus calendar/);assert.doesNotMatch(html,/Open this item|Treat this as suspicious|data-warning/);
+ const click=dataset=>handlers.click({target:{closest(selector){return selector==='button'?{dataset,disabled:false}:null}}});
+ click({choice:'more'});click({action:'reflect'});assert.doesNotMatch(html,/What would you check/);
+ handlers.toggle({target:{matches(selector){return selector==='details[data-clue]'},open:true,dataset:{clue:'calendar'}}});
+ click({action:'reflect'});assert.match(html,/What would you check/);click({action:'reveal'});assert.doesNotMatch(html,/data-warning/);
+ handlers.change({target:{matches(){return true},value:'0',checked:true}});click({action:'reveal'});assert.match(html,/data-warning/);
+ click({action:'act'});assert.match(html,/What would you actually do/);click({action:'done'});assert.doesNotMatch(html,/YOUR TAKE-HOME HABIT/);
+ click({practical:'0'});click({action:'done'});assert.match(html,/YOUR TAKE-HOME HABIT/);
+ for(const item of scenarios){sandbox.location.pathname='/challenge/'+item.id;runInNewContext(source,{...sandbox});assert.doesNotMatch(html,/undefined|Open this item/);assert.match(html,/data-clue/)}
 });

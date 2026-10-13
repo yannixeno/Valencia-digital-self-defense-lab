@@ -39,3 +39,5 @@ Google Fonts is loaded for typography with system-font fallbacks; remove the fon
 `npm test` checks content, recovery, action explanations, privacy boundaries, and progression gates. `node --check app.js` checks syntax. Browser checks cover clue gating, reflection, safe/unsafe practical-action feedback, recovery, direct-route refresh, mobile layout, and facilitator printing. Avoid collecting student data in testing.
 
 App previews use a shared Valencia/Outlook mail frame, Teams chat frame, Microsoft Authenticator approval frame, Microsoft 365 sign-in styling, and iMessage-style SMS. Fictional identities, simulation labels, inactive controls, and fixed credential/code displays remain mandatory.
+
+QR visits start directly in the artifact. Names, link previews, and message details are native accessible disclosure controls. The club item includes a separate fictional calendar; an expected sign-in adds a legitimate context alongside unexpected requests. /cards prints student-facing artifacts without answers; /facilitator retains takeaways. QR assets encode the public Pages URLs.
