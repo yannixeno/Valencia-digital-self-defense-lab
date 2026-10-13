@@ -1,59 +1,15 @@
-# Digital Self-Defense workshop
+# Puma Patrol
 
-Valencia College Cyber Defense Club · November 6, 2026 · Poinciana Campus.
+An interactive digital safety workshop by the Valencia College Cyber Defense Club.
 
-The physical room drives the experience. Students scan a flyer or laminated card, inspect its fictional message, share their reasoning, and choose a practical action. There is no catalog on the welcome page, prescribed scenario order, score, or completion requirement.
+Explore a playful campus world and practice making thoughtful choices online.
 
-Each item opens with a brief scene card, followed by Look → Think → Discover → Choose → Take it with you. Previous-step controls preserve choices only while the item is open. Tap “Show me” on a warning to expand its explanation and highlight the relevant message or clue. A colored habit card concludes the item before students return to the physical workshop. Motion respects reduced-motion settings. All email scenarios use the shared Valencia-style simulated inbox.
+## Run locally
 
-Design references: [Jigsaw Phishing Quiz](https://phishingquiz.withgoogle.com/) for focused inspection and progressive reveals, and [Be Internet Awesome](https://beinternetawesome.withgoogle.com/en_us) for distinct visual themes and practice through interaction. No source code, assets, or branding from those references is included; no name/email setup is used.
+Requires Node.js 24.
 
-## Local demo
+```sh
+npm start
+```
 
-Node.js 24; no dependencies to install. Run `npm start`, then open http://localhost:3000. Phones on the same Wi-Fi can use your computer’s LAN IP and port if your firewall and Wi-Fi permit it.
-
-## Routes and hosting
-
-`/` welcomes students with STOP → CHECK → PROTECT and invites them to scan a workshop item. `/challenge/SCENARIO-ID/` opens an item directly. `/complete/` reinforces the habit and sends students back to the room. `/facilitator/` lists all items for staff, including printable card labels, URLs, questions, takeaways, and time estimates. The facilitator page is public educational material, not an authenticated dashboard.
-
-GitHub Pages: repository Settings → Pages → Source → GitHub Actions. The included workflow tests and builds on main, then deploys dist. Pull requests test/build without deploying. `npm run build` generates an index.html for every route. Set BASE_PATH to /REPOSITORY for a manual project-URL build. Existing QR destinations remain unchanged.
-
-## Scenario authoring
-
-Edit scenarios.js. Core message fields describe the artifact. The workshopDetails object is keyed by the same scenario id and provides label, question, clue, practical actions, and recovery. Each action is [label, safest boolean, explanation]. Include one safest action and explanations for all alternatives. Recovery is an array of short steps; use an empty array when it is not applicable. Estimates default to 2–3 minutes. New scenario ids also need a matching workshopDetails entry; tests check this. Rebuild to generate the new static URL.
-
-Message types: offer (flyer), email (inbox), social (DM), sms (phone thread), mfa (push notification), login (static sign-in preview). Each has tap-to-expand clues. A student must inspect at least one clue and choose a verdict before reflection; at least one reflection before reveal; and an action before its explanation. Warnings are revealed only after reflection. Native details controls support keyboard and touch. Internal stage navigation focuses its heading.
-
-## Physical setup
-
-Use the deployed facilitator page to get final URLs. Print its staff sheet and copy its short labels onto physical cards. Generate QR graphics from those URLs separately. Students can start anywhere. Ask the suggested discussion question when they return to the room. Do not place the facilitator answer sheet among student artifacts.
-
-## Privacy and safety
-
-No backend, analytics, response submission, or participant tracking. Choices and clue state are held only in memory and disappear on refresh/navigation. No browser storage is used. No editable credential, identity, payment, or free-text fields exist. Reflection checkboxes are predefined. Login identities/passwords are fixed display text. Simulated links and message action buttons are inert; domains use reserved .example addresses. The app has no authentication functionality and never opens simulated destinations.
-
-Google Fonts is loaded for typography with system-font fallbacks; remove the font import for a fully offline demo. GitHub Pages can retain ordinary hosting request logs; the app does not collect participant data.
-
-## Verification
-
-`npm test` checks content, recovery, action explanations, privacy boundaries, and progression gates. `node --check app.js` checks syntax. Browser checks cover clue gating, reflection, safe/unsafe practical-action feedback, recovery, direct-route refresh, mobile layout, and facilitator printing. Avoid collecting student data in testing.
-
-App previews use a shared Valencia/Outlook mail frame, Teams chat frame, Microsoft Authenticator approval frame, Microsoft 365 sign-in styling, and iMessage-style SMS. Fictional identities, simulation labels, inactive controls, and fixed credential/code displays remain mandatory.
-
-QR visits start directly in the artifact. Names, link previews, and message details are native accessible disclosure controls. The club item includes a separate fictional calendar; an expected sign-in adds a legitimate context alongside unexpected requests. /cards prints student-facing artifacts without answers; /facilitator retains takeaways. QR assets encode the public Pages URLs.
-
-The main experience is now a sequential narrative: A Day at Valencia. Story order, time, introduction, and transition text are defined in scenarios.js. Start from the welcome; complete each inspect/reflect/reveal/action flow to get the next scene link. The last scene goes to the story ending. Direct scenario URLs still work, but progress indicates story position, not completed items. No participant progress or answers are stored. The QR/card experience is retired; /cards shows the welcome for old bookmarks.
-
-Interactive previews: email rows open sample messages, sender/link disclosure controls open on mouse hover, focus, or tap, and Escape closes them. Course-app verification is a separate fictional sample. MFA actions and reply/report/delete controls show simulation notices and never affect the workshop verdict or send anything. Notification/message arrivals animate once per scene, with replay and reduced-motion support.
-
-## Campus adventure
-
-The welcome now includes an illustrated practice campus with ten missions across Signal Station (account access), Trust Commons (message investigation), and Discovery Grove (independent verification). Students can follow the chronological story or choose a mission from the map. Each mission retains clue inspection, verdict, reflection, reveal, and practical-action gates. Practical choices are presented as routes; completing the explained action adds a habit stamp to the campus map for the current visit only. Refresh clears stamps. There is no score or participant tracking. These fictional neighborhood names describe the activity, not actual college facilities.
-
-The visual direction uses original geometric campus artwork and Valencia workshop scenarios. It draws on Interland's world navigation, mission framing, and immediate feedback; it does not incorporate Google's game assets or code. The experience uses responsive HTML/CSS and inline SVG, with keyboard-accessible links, visible focus, and reduced-motion support.
-
-## Puma Patrol 3D landing
-
-The landing page now runs an original Three.js WebGL world: a floating campus island with an animated low-poly puma and three clickable mission portals. Tap the ground to walk, drag to rotate the camera, or focus the canvas and use arrows/WASD. The camera buttons and three HTML mission-area buttons provide keyboard and touch alternatives. Portal selection opens a mission list; Escape closes it. Mission links open the existing investigation scenarios, which remain guided workshop activities rather than 3D minigames.
-
-Three.js 0.180.0 is vendored in `vendor/` with its MIT license so the scene needs no external CDN or runtime package installation. `campus3d.js` constructs the original models and cleans up the renderer, animation, resources, and keyboard handlers on route changes. Reduced-motion mode disables idle, gait, and portal animation. Devices without WebGL can use the same HTML mission picker. The build copies the 3D module and vendor files into `dist/` for GitHub Pages project paths.
+Use `npm test` to run checks and `npm run build` to build the site.
