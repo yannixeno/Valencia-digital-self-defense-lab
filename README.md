@@ -1,7 +1,7 @@
 # Puma Patrol
 Link to website: https://yannixeno.github.io/Valencia-digital-self-defense-lab/
 
-An interactive digital safety workshop by the Valencia College Cyber Defense Club.
+An interactive digital safety workshop created by Ioannis Xenofontos and the Valencia College Cyber Defense Club.
 
 Explore a playful campus world and practice making thoughtful choices online.
 
