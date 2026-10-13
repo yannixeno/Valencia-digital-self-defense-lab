@@ -50,3 +50,107 @@ scenarios.sort((a,b)=>story.findIndex(x=>x[0]===a.id)-story.findIndex(x=>x[0]===
 const lunch=scenarios.find(s=>s.id==='qr-free-food');
 lunch.context='Near the cafeteria, a flyer points you to this student lunch offer.';
 lunch.body='The first 100 students get a free meal. Open the offer, sign in with your college account, and claim yours before 2 PM!';
+
+
+// Optional local-only branches. Actions name a next step; no action contains a URL to open.
+// `view: original` keeps the existing artifact. Other views are fixed, non-editable previews.
+// `resolved` means a practical action was already demonstrated, so the lesson need not ask it again.
+const branchAction=(id,label,next,placement='surface')=>({id,label,next,placement});
+const resolution=(title,body)=>({view:'result',title,body,resolved:true,review:true,actions:[]});
+const recoveryActions=[branchAction('security','Open the official account security page','security'),branchAction('change','Change my password through a trusted route','changed'),branchAction('ignore','Ignore the alert','ignored'),branchAction('another','Approve another request','another'),branchAction('it','Contact campus IT','it')];
+const accountRecovery={
+ security:{view:'trusted',title:'Official account security · sample',body:'You independently opened your account security settings. An unfamiliar sign-in appears. Sign out other sessions and change your password here.',actions:[branchAction('change','Change the password and sign out other sessions','changed'),branchAction('it','Contact campus IT','it')]},
+ changed:resolution('Account secured in this simulation','You used a trusted route to change the password and sign out other sessions. Review recovery details too. For a college account, contact campus IT promptly.'),
+ it:resolution('Campus IT contacted · simulation','You found campus IT through the official college website rather than the suspicious message. Explain what happened and ask for help securing the account.'),
+ ignored:{view:'alert',title:'The unfamiliar sign-in remains',body:'Ignoring the alert does not remove access. One mistaken tap does not end the learning process. What useful step can you take now?',actions:recoveryActions.filter(a=>!['ignore','another'].includes(a.id))},
+ another:{view:'alert',title:'Another fictional request approved',body:'Approving another request could allow more access. You can still act now through a trusted route.',actions:recoveryActions.filter(a=>!['ignore','another'].includes(a.id))}
+};
+const interactions={
+ 'mfa-request':{
+  start:'initial',facilitator:{points:'Approve or deny an unrequested sign-in; respond to a later security alert.',unsafe:'Approval lets an unfamiliar sign-in proceed; ignoring a security alert leaves the situation unresolved.',safe:'Deny an unexpected request; use independently opened account security settings or campus IT for recovery.',question:'If you already approved, what can you do next without trusting another notification?'},
+  steps:{
+   initial:{view:'original',title:'Try the sign-in request',actions:[branchAction('deny','No, it’s not me','denied','mfa'),branchAction('approve','Approve','approved','mfa')]},
+   approved:{view:'alert',title:'Sign-in approved · simulation',body:'You approved a sign-in you did not initiate. No real account was accessed. Continue to see what happens next in this fictional account.',actions:[branchAction('next','See the next account alert','alert')]},
+   alert:{view:'alert',title:'Password changed successfully · fictional alert',body:'A moment later, the sample account shows a password-change alert. This is a possible consequence, not something that always happens after approval. What should you do now?',actions:recoveryActions},
+   denied:{view:'result',title:'Request denied · simulation',body:'The unrequested sign-in was blocked. You did not start it, so denying was the safer choice. Still check the official account app for unexpected activity.',actions:[branchAction('check','Open the official account security page','checked')]},
+   checked:resolution('You checked through a trusted route','You denied the unexpected request and independently opened account activity. If requests continue or activity looks unfamiliar, change the password there and contact campus IT.'),
+   ...accountRecovery
+  }
+ },
+ 'qr-free-food':{
+  start:'initial',facilitator:{points:'Claim the meal; inspect the promotion; continue to a sign-in preview or stop.',unsafe:'A tempting offer escalates into a college-password request at an unrelated address.',safe:'Stop and check the offer with Student Development without using the flyer’s contact.',question:'At which step did the lunch offer start asking for more than you expected?'},
+  steps:{
+   initial:{view:'original',title:'Try the lunch offer',artifact:{body:'FREE CHICK-FIL-A · First 100 students. Claim your meal before 2 PM!',cta:'Claim my meal'},actions:[branchAction('claim','Claim my meal · simulate scan','promotion','cta'),branchAction('staff','Ask Student Development instead','verified','extra')]},
+   promotion:{view:'page',title:'Your free meal is waiting',body:'Verify that you are a Valencia student to reserve your meal. College sign-in is required.',domain:'valencia-meals.example',actions:[branchAction('continue','Continue with college account','login'),branchAction('stop','Stop and check with Student Development','verified'),branchAction('back','Back to the flyer','initial')]},
+   login:{view:'login',title:'Sign in to claim your meal',body:'This promotion now asks for your college login. These are fixed sample displays, not fields.',domain:'valencia-meals.example',actions:[branchAction('signin','Sign in · sample only','pause'),branchAction('stop','Stop and check the offer with campus staff','verified'),branchAction('back','Back to the promotional page','promotion')]},
+   pause:{view:'login',title:'Before entering anything, pause',body:'You were about to enter a college password for a free meal on an unrelated website. No information was entered. Is this a place you trust?',domain:'valencia-meals.example',emphasizeDomain:true,actions:[branchAction('inspect','Inspect the address again','address'),branchAction('stop','Close this preview and ask campus staff','verified')]},
+   address:{view:'page',title:'The address belongs to this promotion',body:'The website address tells you where you are. A college logo does not make valencia-meals.example an official college service.',domain:'valencia-meals.example',actions:[branchAction('stop','Check with Student Development independently','verified'),branchAction('back','Back to the login preview','login')]},
+   verified:resolution('You checked the offer independently','In this fictional exercise, Student Development has no record of this promotion. You stopped before sharing account details and checked with a known campus office.')
+  }
+ },
+ 'social-message':{
+  start:'initial',facilitator:{points:'Send a sample code, ask the account to confirm itself, call a saved number, or report.',unsafe:'Sending a sign-in code may give access to your account; a reply saying “it’s me” is not independent evidence.',safe:'Use Jamie’s saved number, keep codes private, and report the impersonation.',question:'Why is a saved contact stronger evidence than asking the new account who it is?'},
+  steps:{
+   initial:{view:'original',title:'Respond inside the sample chat',actions:[branchAction('send','Send the code · sample only','sent','chat'),branchAction('ask','Ask “Is this really you?”','asked','chat'),branchAction('call','Call Jamie using a saved number','called','chat'),branchAction('report','Ignore / report this account','reported','chat')]},
+   asked:{view:'chat',title:'Jamie · unfamiliar account',reply:'yeah lol it’s me',body:'The same account says it is Jamie. That answer does not independently establish who is typing. What will you do next?',actions:[branchAction('send','Send the sample code','sent'),branchAction('call','Call Jamie using a saved number','called'),branchAction('report','Ignore / report','reported')]},
+   sent:{view:'chat',title:'Jamie · unfamiliar account',reply:'thanks!! you’re the best',body:'The other person now has the fictional sign-in code. That code may have been for YOUR account. No real code was sent. What should you do now?',actions:recoveryActions.filter(a=>a.id!=='another')},
+   called:{view:'chat',title:'Saved contact · fictional call',reply:'Jamie: “I didn’t ask you for a code. That isn’t my account.”',body:'You used a number already saved for Jamie rather than information supplied by the new account. No call was placed.',actions:[branchAction('report','Keep the code private and report the impersonation','reported')]},
+   reported:resolution('Code kept private / account reported · simulation','You stopped the conversation and reported the sample account. If you already sent a real sign-in code, also secure your account through the official service; reporting alone does not remove access.'),
+   ...Object.fromEntries(Object.entries(accountRecovery).filter(([id])=>id!=='another'))
+  }
+ },
+ 'internship-offer':{
+  start:'initial',facilitator:{points:'Learn more; encounter no interview, an equipment check, then a payment to a vendor.',unsafe:'Sending money before a check is confirmed can leave the student responsible when the check is rejected.',safe:'Verify with the career center; if money was already sent, contact the bank immediately.',question:'How did the attractive job offer turn into a request for your money?'},
+  steps:{
+   initial:{view:'original',title:'Explore the offer',artifact:{body:'Remote internship · $45/hour · Flexible schedule around your classes. Interested in learning more?',clue:'Unrequested offer · No previous conversation with this recruiter',cta:'Learn more'},actions:[branchAction('more','Learn more','selected','cta'),branchAction('verify','Ask the college career center','verified','extra')]},
+   selected:{view:'page',title:'You have been selected',body:'No interview is required. Reply to continue with your equipment arrangements.',actions:[branchAction('continue','Continue with the offer','equipment'),branchAction('verify','Verify with the career center first','verified')]},
+   equipment:{view:'page',title:'We will send you a $2,400 check',body:'The recruiter says the check will cover equipment for your new internship.',actions:[branchAction('continue','See the equipment instructions','vendor'),branchAction('verify','Ask the career center about the check','verified')]},
+   vendor:{view:'page',title:'Send $600 to our approved vendor',body:'Deposit the check, then send $600 to the vendor to get started. What will you do?',actions:[branchAction('send','Deposit the check and send $600 · simulate','sent'),branchAction('verify','Stop and verify with the college career center','verified'),branchAction('promise','Ask the recruiter to promise it is real','promise')]},
+   promise:{view:'page',title:'“Of course it’s real!” · fictional recruiter',body:'The person making the offer cannot independently verify their own story. A promise does not confirm the check.',actions:[branchAction('send','Send $600 in the simulation','sent'),branchAction('verify','Use the college career center instead','verified')]},
+   sent:{view:'alert',title:'$600 sent · fictional consequence',body:'You sent $600 before the check was confirmed. The sample check is later rejected; the bank may hold you responsible for the money. No deposit or payment actually happened. What now?',actions:[branchAction('bank','Contact my bank using its app or a known number','bank'),branchAction('more','Send another payment','more-money'),branchAction('save','Stop payments and save the messages','records')]},
+   'more-money':{view:'alert',title:'Another payment will not fix the check',body:'Sending more money can increase the loss. You can still stop and ask the bank for help.',actions:[branchAction('bank','Contact my bank immediately','bank')]},
+   records:{view:'result',title:'Messages saved in this fictional situation',body:'Stop sending money and keep the offer and payment records. Contact your bank immediately about the rejected check and transfer.',actions:[branchAction('bank','Contact the bank through a known route','bank')]},
+   bank:resolution('Bank contacted · simulation','You used the bank’s official app or a known phone number, explained the check and payment, and stopped sending money. Keep the messages and payment records.'),
+   verified:resolution('Career center check · simulation','You independently contacted the college career center. In this exercise, the employer cannot be verified. You did not deposit a check or send money.')
+  }
+ }
+};
+for(const [id,interaction] of Object.entries(interactions))scenarios.find(s=>s.id===id).interaction=interaction;
+
+// Reuse the same renderer and transition rules for the remaining exploratory paths.
+const fileLogin=scenarios.find(s=>s.id==='fake-login');
+fileLogin.interaction={
+ start:'initial',facilitator:{points:'Inspect the address and arrival context; try Sign in, back out, or independently open the college/Microsoft app.',unsafe:'A copied sign-in appearance can lead toward entering a password at an unrelated address.',safe:'Stop before entering anything and look for the file in an independently opened official app.',question:'What can the page’s appearance tell you, and what does the address tell you?'},
+ steps:{
+  initial:{view:'original',title:'Explore the sign-in preview',actions:[branchAction('signin','Sign in · sample only','pause','cta'),branchAction('official','Open official Microsoft / college app instead','official','extra'),branchAction('back','Back out of the sign-in preview','backed','extra')]},
+  pause:{view:'login',title:'Before entering anything, take another look at where you are',body:'You were about to enter your college password into an unrelated website. No information was entered. A page can look correct while its address is wrong.',domain:fileLogin.url,emphasizeDomain:true,actions:[branchAction('address','Inspect the address and how I arrived','address'),branchAction('official','Open the official Microsoft / college app instead','official'),branchAction('back','Go back','initial')]},
+  address:{view:'page',title:'A Teams link brought you here',body:'The sample address is microsoft-student-files.example. The familiar Microsoft styling does not verify who owns this page. The link from the group chat led you here before any file preview.',domain:fileLogin.url,emphasizeDomain:true,actions:[branchAction('official','Open the official app myself and ask the sender','official'),branchAction('back','Go back to inspect the preview','initial')]},
+  backed:{view:'result',title:'You backed out · simulation',body:'You closed the unrelated sign-in preview before entering anything. You can still look for the study guide through a trusted route.',actions:[branchAction('official','Open the official college / Microsoft app','official'),branchAction('back','Revisit the sample page','initial')]},
+  official:resolution('Official app opened independently · sample','You opened the official app yourself instead of following the group-chat link. Ask the person who shared the file to share it there. No actual app was launched.')
+ }
+};
+const passwordEmail=scenarios.find(s=>s.id==='password-reset');
+passwordEmail.interaction={
+ start:'initial',facilitator:{points:'Follow the email’s account button into a sample sign-in, inspect the address, go back, or use the portal/IT independently.',unsafe:'A deadline can push a student from a familiar inbox onto a password-requesting page.',safe:'Use a saved official portal or independently found IT contact rather than the email link.',question:'What is different about opening your own saved portal instead of this email’s button?'},
+ steps:{
+  initial:{view:'original',title:'Try the email’s button safely',actions:[branchAction('open','Keep my account active · simulation','login','cta'),branchAction('portal','Open official college portal instead','portal','extra'),branchAction('it','Contact campus IT through a known route','it','extra')]},
+  login:{view:'login',title:'Keep your account active · sample sign-in',body:'The email link opened this sign-in preview. It asks for your current college password. Nothing can be entered here.',domain:passwordEmail.url,actions:[branchAction('signin','Try Sign in · no details entered','pause'),branchAction('back','Go back to the email','initial'),branchAction('portal','Open official college portal myself','portal'),branchAction('it','Contact campus IT','it')]},
+  pause:{view:'login',title:'Pause before entering a password',body:'You followed an urgent email to an unfamiliar website. Its college-looking name does not prove this is your portal.',domain:passwordEmail.url,emphasizeDomain:true,actions:[branchAction('portal','Open my saved official college portal','portal'),branchAction('back','Go back to the email','initial'),branchAction('it','Contact campus IT independently','it')]},
+  portal:resolution('College portal opened independently · sample','You used your own trusted bookmark to review account notices. If you are unsure whether a change is needed, contact campus IT through the official college website. Nothing was entered on the email’s page.'),
+  it:resolution('Campus IT contacted · simulation','You found IT through the official college website rather than replying to the email. Ask them to confirm the request. If you already shared a password in real life, change it through the official portal and tell IT.')
+ }
+};
+const delivery=scenarios.find(s=>s.id==='package-delivery');
+const deliveryRoutes=[branchAction('order','Check my original order confirmation','order'),branchAction('carrier','Open the official carrier app myself','carrier'),branchAction('website','Type the official carrier website myself','website')];
+delivery.interaction={
+ start:'initial',facilitator:{points:'Open the text’s link; see the small fee; continue to a display of requested payment details; choose a trusted tracking route.',unsafe:'A $0.30 fee can be a way to request much more valuable personal and card information.',safe:'Use the original order, an independently opened carrier app, or a known official website.',question:'Does expecting a package make this particular text trustworthy?'},
+ steps:{
+  initial:{view:'original',title:'Explore the delivery message',actions:[branchAction('open','Schedule redelivery · open sample page','hold','cta'),branchAction('carrier','Open official carrier app instead','carrier','extra')]},
+  hold:{view:'page',title:'PACKAGE ON HOLD',body:'Redelivery fee: $0.30. Schedule a new delivery for this package.',domain:delivery.url,actions:[branchAction('schedule','Schedule Redelivery · simulation','payment'),...deliveryRoutes,branchAction('back','Back to the text message','initial')]},
+  payment:{view:'payment',title:'This page now wants your card details',body:'For a $0.30 charge, this page would request the information listed below. These are labels, not editable fields. What would you do now?',domain:delivery.url,fields:['Name','Address','Card number','Expiration date','CVV / card security code'],actions:[branchAction('continue','Continue with payment · sample only','payment-warning'),...deliveryRoutes,branchAction('back','Back to the delivery page','hold')]},
+  'payment-warning':{view:'alert',title:'A small fee, a much bigger request',body:'This path could give a stranger your personal and card details. No information was entered and no payment was made. In real life, if you already supplied card information, contact your bank through its app or the number on your card.',actions:deliveryRoutes},
+  order:resolution('Original order checked · simulation','You opened your original order confirmation and used its tracking details instead of the text’s link. In this sample, no redelivery payment appears in the original tracking information.'),
+  carrier:resolution('Official carrier app opened independently · sample','You opened the carrier’s app yourself and checked tracking from your order. Expecting a package did not establish who sent the text.'),
+  website:resolution('Known carrier website opened · sample','You typed the carrier’s known official address yourself and checked your original tracking details. You did not copy an address supplied by the suspicious text.')
+ }
+};
