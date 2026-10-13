@@ -37,3 +37,5 @@ Google Fonts is loaded for typography with system-font fallbacks; remove the fon
 ## Verification
 
 `npm test` checks content, recovery, action explanations, privacy boundaries, and progression gates. `node --check app.js` checks syntax. Browser checks cover clue gating, reflection, safe/unsafe practical-action feedback, recovery, direct-route refresh, mobile layout, and facilitator printing. Avoid collecting student data in testing.
+
+App previews use a shared Valencia/Outlook mail frame, Teams chat frame, Microsoft Authenticator approval frame, Microsoft 365 sign-in styling, and iMessage-style SMS. Fictional identities, simulation labels, inactive controls, and fixed credential/code displays remain mandatory.
