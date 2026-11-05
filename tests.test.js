@@ -130,3 +130,25 @@ test('Email branch consequences restore the scenario pane after browsing unrelat
 test('Previous-step navigation follows the shorter branch lesson and an explicit verdict can restore the original flow',async()=>{
  const h=await branchHarness('mfa-request');h.click({branch:'deny'});h.click({branch:'check'});h.click({action:'branch-reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'branch-done'});h.click({action:'previous'});assert.match(h.html(),/data-warning/);assert.doesNotMatch(h.html(),/What would you actually do/);h.click({action:'previous'});assert.match(h.html(),/What would you check/);h.click({action:'previous'});h.inspect('context');h.click({choice:'suspicious'});h.click({action:'reflect'});assert.match(h.html(),/You chose <strong>Suspicious/);h.reflect();h.click({action:'reveal'});assert.match(h.html(),/Decide what I’d actually do/);
 });
+
+test('Reveal compares the selected verdict with the best assessment and gives a reason',async()=>{
+ for(const [id,clue,chosen,best,match] of [
+ ['expected-sign-in','context','safe','Safe',true],
+ ['expected-sign-in','context','suspicious','Safe',false],
+ ['mfa-request','context','safe','Suspicious',false],
+ ['club-announcement','calendar','more','Need more information',true]
+ ]){
+  const h=await branchHarness(id);h.inspect(clue);h.click({choice:chosen});h.click({action:'reflect'});h.reflect();
+  assert.doesNotMatch(h.html(),/Best assessment/);h.click({action:'reveal'});
+  assert.ok(h.html().includes('<dt>Your choice</dt><dd>'+choices[chosen]+'</dd>'));
+  assert.ok(h.html().includes('<dt>Best assessment</dt><dd>'+best+'</dd>'));
+  assert.match(h.html(),match?/You got it/:/Not the best assessment/);assert.match(h.html(),/<strong>Why:<\/strong> .+/);
+ }
+ const h=await branchHarness('mfa-request');h.click({branch:'deny'});h.click({branch:'check'});h.click({action:'branch-reflect'});h.reflect();h.click({action:'reveal'});
+ assert.match(h.html(),/Scenario debrief/);assert.doesNotMatch(h.html(),/<dt>Your choice|Not the best assessment|You got it/);
+});
+test('An unsafe next action keeps the reason and a concrete alternative',async()=>{
+ const h=await branchHarness('expected-sign-in');h.inspect('context');h.click({choice:'safe'});h.click({action:'reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'act'});h.click({practical:'1'});h.click({action:'done'});
+ assert.match(h.html(),/There’s a safer option/);assert.match(h.html(),/A familiar-looking prompt can still be unexpected/);
+ assert.match(h.html(),/Try this instead:<\/strong> Approve only after confirming my own sign-in matches/);
+});

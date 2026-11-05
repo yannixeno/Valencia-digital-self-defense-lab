@@ -44,3 +44,14 @@ header{border-bottom:1px solid #23334f18}.brand-icon{background:var(--campus-cor
 @media(max-width:750px){.branch-content{padding:20px 16px}.branch-content h2{font-size:22px}.branch-button{min-height:48px;padding:13px 14px;font-size:13px}.branch-safety{font-size:8px;padding:12px 14px}.branch-surface .clue{margin:12px}.branch-history ol{padding-left:20px}.branch-reply{overflow-wrap:anywhere}.facilitator-branches{padding:14px}}
 @media print{.facilitator-branches{break-inside:avoid;background:white}.branch-actions{display:none}}
 .domain-callout{margin:0;padding:16px 20px;border-block:2px solid #c7842b;background:#fff3d8;color:#64431a;font-size:14px;font-weight:700;overflow-wrap:anywhere}.branch-payment .requested-details{list-style:none;padding:0}.branch-payment .requested-details li{padding:12px 14px;border:1px solid #ccd8e2;border-radius:5px;background:#f5f7fa;font-size:14px}
+
+/* Feedback is labeled in words so color never carries the answer alone. */
+.answer-feedback{margin:18px 0;padding:16px;border:1px solid var(--answer-line,#c8d6df);border-radius:12px;background:var(--answer-bg,#eff5fa);color:#172d3a}
+.answer-match{--answer-bg:#edf7ef;--answer-line:#a9cbb1;--answer-ink:#235b3d}
+.answer-review{--answer-bg:#fff4e4;--answer-line:#ddbe8f;--answer-ink:#744817}
+.action-feedback.answer-match,.action-feedback.answer-review{background:var(--answer-bg);border:1px solid var(--answer-line)}
+.answer-feedback .answer-status,.action-feedback .answer-status{font-size:1rem;font-weight:800;color:var(--answer-ink,#284e68);margin:0 0 12px}
+.answer-feedback dl{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.answer-feedback dl>div{flex:1 1 126px;padding:9px 11px;border-radius:7px;background:#ffffffbc}
+.answer-feedback dt{font-size:.76rem;color:#405465}.answer-feedback dd{margin:4px 0 0;font-size:.95rem;font-weight:750}
+.answer-feedback p:last-child{margin-bottom:0;line-height:1.55}
