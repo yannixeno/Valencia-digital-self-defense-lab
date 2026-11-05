@@ -65,10 +65,10 @@ test('Preview actions stay separate from verdicts and preserve privacy',async()=
 });
 
 // Exercise the real app handlers without introducing a browser dependency into the static project.
-async function branchHarness(id,basePath=''){
+async function branchHarness(id,basePath='',guideClue=null){
  const {runInNewContext}=await import('node:vm');const handlers={};let html='';
  const button={disabled:false,focus(){}};
- const app={set innerHTML(value){html=value},querySelectorAll(selector){if(selector!=='[data-route]')return [];return [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*data-route[^>]*>/g)].map(match=>{let href=match[1];return {dataset:{},getAttribute(){return href},setAttribute(name,value){html=html.replace('href="'+href+'"','href="'+value+'"');href=value}}})},querySelector(){return button},addEventListener(name,fn){handlers[name]=fn}};
+ const app={set innerHTML(value){html=value},querySelectorAll(selector){if(selector!=='[data-route]')return [];return [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*data-route[^>]*>/g)].map(match=>{let href=match[1];return {dataset:{},getAttribute(){return href},setAttribute(name,value){html=html.replace('href="'+href+'"','href="'+value+'"');href=value}}})},querySelector(selector){if(guideClue&&selector.startsWith('.artifact [data-clue=')){guideClue.target=selector;return guideClue}return button},addEventListener(name,fn){handlers[name]=fn}};
  const source=(await readFile('app.js','utf8')).replace(/import .*?;\r?\n/,'');
  const context={scenarios,choices,document:{querySelector(selector){return selector==='#app'?app:selector==='meta[name=app-base]'?{content:basePath}:null}},location:{pathname:basePath+'/challenge/'+id,origin:'https://workshop.example'},window:{addEventListener(){},scrollTo(){}},history:{pushState(){}}};
  runInNewContext(source,context);
@@ -151,4 +151,19 @@ test('An unsafe next action keeps the reason and a concrete alternative',async()
  const h=await branchHarness('expected-sign-in');h.inspect('context');h.click({choice:'safe'});h.click({action:'reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'act'});h.click({practical:'1'});h.click({action:'done'});
  assert.match(h.html(),/There’s a safer option/);assert.match(h.html(),/A familiar-looking prompt can still be unexpected/);
  assert.match(h.html(),/Try this instead:<\/strong> Approve only after confirming my own sign-in matches/);
+});
+
+test('The mission guide opens and focuses the relevant clue without revealing the verdict',async()=>{
+ const summary={focus(){this.focused=true},scrollIntoView(){this.scrolled=true}};
+ const clue={open:false,dataset:{clue:'sender'},classList:{add(value){assert.equal(value,'guide-target')}},querySelector(){return summary}};
+ const email=await branchHarness('password-reset','',clue);
+ assert.match(email.html(),/Check the sender/);
+ assert.match(email.html(),/Show me where to look/);
+ assert.ok(email.html().indexOf('data-choice="safe"')<email.html().indexOf('Optional: try a simulated action'));
+ email.click({action:'guide-inspect'});
+ assert.equal(clue.target,'.artifact [data-clue="sender"]');assert.ok(clue.open&&summary.focused&&summary.scrolled);
+ assert.doesNotMatch(email.html(),/Best assessment/);
+ const mfa=await branchHarness('mfa-request');assert.match(mfa.html(),/Check the sign-in details/);
+ mfa.click({branch:'deny'});assert.match(mfa.html(),/Show me the next choices/);
+ mfa.click({branch:'check'});assert.match(mfa.html(),/Reflect on the result/);
 });
