@@ -166,3 +166,12 @@ test('The mission guide opens and focuses the relevant clue without revealing th
  mfa.click({branch:'deny'});assert.match(mfa.html(),/Show me the next choices/);
  mfa.click({branch:'check'});assert.match(mfa.html(),/Reflect on the result/);
 });
+
+test('The final mission invites independent practice and leaves help on demand',async()=>{
+ const last=await branchHarness('club-announcement');
+ assert.match(last.html(),/FINAL REHEARSAL/);
+ assert.match(last.html(),/<details><summary>Need a hint\?<\/summary>/);
+ assert.doesNotMatch(last.html(),/Best assessment|Show me the sign-in details/);
+ last.inspect('calendar');last.click({choice:'more'});last.click({action:'assess'});
+ assert.match(last.html(),/<dt>Best assessment<\/dt><dd>Need more information<\/dd>/);
+});

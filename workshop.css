@@ -190,3 +190,8 @@ main.challenge-main:has(.college-mail-layout){
 .optional-reflection{margin:14px 0 20px;padding:12px 14px;border:1px solid #d4dfd2;border-radius:8px;background:#f4f7ef}
 .optional-reflection summary{cursor:pointer;font-weight:700}
 .optional-reflection li{margin-block:6px}
+
+.rehearsal-guide details{min-width:140px;max-width:320px}
+.rehearsal-guide summary{cursor:pointer;font-weight:750;padding:10px 0}
+.rehearsal-guide .button{margin-top:10px}
+.takeaway-example{text-align:left}
