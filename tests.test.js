@@ -11,7 +11,7 @@ test('Application has no credential entry fields or response transmission',async
   assert.doesNotMatch(source,/type=["'](?:password|email|text)["']/);
   assert.doesNotMatch(source,/\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\b/);
   assert.doesNotMatch(source,/localStorage|sessionStorage/);
-  assert.match(source,/b.dataset.action==='reflect'&&choice&&inspected.size/);
+  assert.match(source,/b.dataset.action==='assess'&&stage==='inspect'&&choice&&inspected.size/);
   assert.match(source,/b.dataset.action==='reveal'&&reflections.size/);
   assert.match(source,/b.dataset.action==='done'&&actionIndex!==null/);
   assert.match(source,/let stage='inspect'/); assert.doesNotMatch(source,/reveal\|\|inspected.has/);
@@ -26,14 +26,13 @@ test('Direct entry and full decision flow render without an intro or answer leak
  const {runInNewContext}=await import('node:vm'); const handlers={};let html='';
  const app={set innerHTML(value){html=value},get innerHTML(){return html},querySelectorAll(){return []},querySelector(){return null},addEventListener(name,fn){handlers[name]=fn}};
  const source=(await readFile('app.js','utf8')).replace(/import .*?;\r?\n/,'');
- let reflectButton={disabled:true},revealButton={disabled:true},doneButton={disabled:true};app.querySelector=selector=>selector.includes('reflect')?reflectButton:selector.includes('reveal')?revealButton:selector.includes('done')?doneButton:null;
+ let reflectButton={disabled:true},revealButton={disabled:true},doneButton={disabled:true};app.querySelector=selector=>selector.includes('assess')?reflectButton:selector.includes('reveal')?revealButton:selector.includes('done')?doneButton:null;
  const sandbox={scenarios,choices,document:{querySelector(selector){return selector==='#app'?app:null}},location:{pathname:'/challenge/club-announcement',origin:'https://workshop.example'},window:{addEventListener(){},scrollTo(){}},history:{pushState(){}}};
  runInNewContext(source,sandbox);assert.match(html,/Campus calendar/);assert.doesNotMatch(html,/Open this item|Treat this as suspicious|data-warning/);
  const click=dataset=>handlers.click({target:{closest(selector){return selector==='button'?{dataset,disabled:false}:null}}});
- click({choice:'more'});click({action:'reflect'});assert.doesNotMatch(html,/What would you check/);
+ click({choice:'more'});click({action:'assess'});assert.doesNotMatch(html,/Best assessment/);
  handlers.toggle({target:{matches(selector){return selector==='details[data-clue]'},open:true,dataset:{clue:'calendar'}}});
- click({action:'reflect'});assert.match(html,/What would you check/);click({action:'reveal'});assert.doesNotMatch(html,/data-warning/);
- handlers.change({target:{matches(){return true},value:'0',checked:true}});click({action:'reveal'});assert.match(html,/data-warning/);
+ click({action:'assess'});assert.match(html,/Best assessment/);assert.match(html,/data-warning/);assert.match(html,/Optional: Think it through/);
  click({action:'act'});assert.match(html,/What would you actually do/);click({action:'done'});assert.doesNotMatch(html,/YOUR TAKE-HOME HABIT/);
  click({practical:'0'});click({action:'done'});assert.match(html,/YOUR TAKE-HOME HABIT/);
  for(const item of scenarios){sandbox.location.pathname='/challenge/'+item.id;runInNewContext(source,{...sandbox});assert.doesNotMatch(html,/undefined|Open this item/);assert.match(html,/data-clue/)}
@@ -128,7 +127,7 @@ test('Email branch consequences restore the scenario pane after browsing unrelat
 });
 
 test('Previous-step navigation follows the shorter branch lesson and an explicit verdict can restore the original flow',async()=>{
- const h=await branchHarness('mfa-request');h.click({branch:'deny'});h.click({branch:'check'});h.click({action:'branch-reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'branch-done'});h.click({action:'previous'});assert.match(h.html(),/data-warning/);assert.doesNotMatch(h.html(),/What would you actually do/);h.click({action:'previous'});assert.match(h.html(),/What would you check/);h.click({action:'previous'});h.inspect('context');h.click({choice:'suspicious'});h.click({action:'reflect'});assert.match(h.html(),/You chose <strong>Suspicious/);h.reflect();h.click({action:'reveal'});assert.match(h.html(),/Decide what I’d actually do/);
+ const h=await branchHarness('mfa-request');h.click({branch:'deny'});h.click({branch:'check'});h.click({action:'branch-reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'branch-done'});h.click({action:'previous'});assert.match(h.html(),/data-warning/);assert.doesNotMatch(h.html(),/What would you actually do/);h.click({action:'previous'});assert.match(h.html(),/What would you check/);h.click({action:'previous'});h.inspect('context');h.click({choice:'suspicious'});h.click({action:'assess'});assert.match(h.html(),/Best assessment/);assert.match(h.html(),/Decide what I’d actually do/);
 });
 
 test('Reveal compares the selected verdict with the best assessment and gives a reason',async()=>{
@@ -138,8 +137,7 @@ test('Reveal compares the selected verdict with the best assessment and gives a 
  ['mfa-request','context','safe','Suspicious',false],
  ['club-announcement','calendar','more','Need more information',true]
  ]){
-  const h=await branchHarness(id);h.inspect(clue);h.click({choice:chosen});h.click({action:'reflect'});h.reflect();
-  assert.doesNotMatch(h.html(),/Best assessment/);h.click({action:'reveal'});
+  const h=await branchHarness(id);h.inspect(clue);h.click({choice:chosen});assert.doesNotMatch(h.html(),/Best assessment/);h.click({action:'assess'});
   assert.ok(h.html().includes('<dt>Your choice</dt><dd>'+choices[chosen]+'</dd>'));
   assert.ok(h.html().includes('<dt>Best assessment</dt><dd>'+best+'</dd>'));
   assert.match(h.html(),match?/You got it/:/Not the best assessment/);assert.match(h.html(),/<strong>Why:<\/strong> .+/);
@@ -148,7 +146,7 @@ test('Reveal compares the selected verdict with the best assessment and gives a 
  assert.match(h.html(),/Scenario debrief/);assert.doesNotMatch(h.html(),/<dt>Your choice|Not the best assessment|You got it/);
 });
 test('An unsafe next action keeps the reason and a concrete alternative',async()=>{
- const h=await branchHarness('expected-sign-in');h.inspect('context');h.click({choice:'safe'});h.click({action:'reflect'});h.reflect();h.click({action:'reveal'});h.click({action:'act'});h.click({practical:'1'});h.click({action:'done'});
+ const h=await branchHarness('expected-sign-in');h.inspect('context');h.click({choice:'safe'});h.click({action:'assess'});h.click({action:'act'});h.click({practical:'1'});h.click({action:'done'});
  assert.match(h.html(),/There’s a safer option/);assert.match(h.html(),/A familiar-looking prompt can still be unexpected/);
  assert.match(h.html(),/Try this instead:<\/strong> Approve only after confirming my own sign-in matches/);
 });
@@ -157,13 +155,14 @@ test('The mission guide opens and focuses the relevant clue without revealing th
  const summary={focus(){this.focused=true},scrollIntoView(){this.scrolled=true}};
  const clue={open:false,dataset:{clue:'sender'},classList:{add(value){assert.equal(value,'guide-target')}},querySelector(){return summary}};
  const email=await branchHarness('password-reset','',clue);
- assert.match(email.html(),/Check the sender/);
+ assert.match(email.html(),/Inspect one clue/);
  assert.match(email.html(),/Show me where to look/);
  assert.ok(email.html().indexOf('data-choice="safe"')<email.html().indexOf('Optional: try a simulated action'));
  email.click({action:'guide-inspect'});
  assert.equal(clue.target,'.artifact [data-clue="sender"]');assert.ok(clue.open&&summary.focused&&summary.scrolled);
  assert.doesNotMatch(email.html(),/Best assessment/);
- const mfa=await branchHarness('mfa-request');assert.match(mfa.html(),/Check the sign-in details/);
+ const first=await branchHarness('expected-sign-in');assert.match(first.html(),/FIRST MISSION · WALKTHROUGH/);assert.match(first.html(),/Show me the sign-in details/);
+ const mfa=await branchHarness('mfa-request');assert.match(mfa.html(),/Inspect one clue/);
  mfa.click({branch:'deny'});assert.match(mfa.html(),/Show me the next choices/);
  mfa.click({branch:'check'});assert.match(mfa.html(),/Reflect on the result/);
 });

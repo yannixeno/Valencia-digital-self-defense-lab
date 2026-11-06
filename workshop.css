@@ -185,3 +185,8 @@ main.challenge-main:has(.college-mail-layout){
 .coupon-sender{left:12%;top:4%;width:37%;height:8%;justify-content:end;padding-inline:8px}
 .coupon-date{left:12%;top:55%;width:40%;height:6%;justify-content:end;padding-inline:8px}
 .coupon-link{left:12%;top:71%;width:80%;height:15%;justify-content:end;padding-inline:8px}
+
+.first-mission .artifact [data-clue="context"]:not([open]){outline:3px solid #426e49;outline-offset:-3px}
+.optional-reflection{margin:14px 0 20px;padding:12px 14px;border:1px solid #d4dfd2;border-radius:8px;background:#f4f7ef}
+.optional-reflection summary{cursor:pointer;font-weight:700}
+.optional-reflection li{margin-block:6px}
