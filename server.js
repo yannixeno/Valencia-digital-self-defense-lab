@@ -1,8 +1,8 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 const root = new URL('./', import.meta.url);
-const allowed = new Set(['index.html','app.js','scenarios.js','styles.css','workshop.css','campus3d.js']);
-const mime = {html:'text/html',js:'text/javascript',css:'text/css',svg:'image/svg+xml'};
+const allowed = new Set(['index.html','app.js','scenarios.js','styles.css','workshop.css','campus3d.js','chick-fil-a-coupon.png']);
+const mime = {html:'text/html',js:'text/javascript',css:'text/css',svg:'image/svg+xml',png:'image/png'};
 http.createServer(async (req,res)=>{
   const path = new URL(req.url,'http://localhost').pathname.replace(/\/$/,'') || '/';
   const name = path === '/' || path.startsWith('/challenge/') || ['/complete','/facilitator','/cards'].includes(path) ? 'index.html' : path.slice(1);

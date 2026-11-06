@@ -168,3 +168,12 @@ main.challenge-main:has(.college-mail-layout){
 .challenge-main .decision-panel h2:focus-visible{
   outline-offset:4px;
 }
+
+.coupon-thread{background:#fff;padding:var(--preview-padding,24px)}
+.coupon-thread>.clue{margin-bottom:14px;border-radius:10px}
+.coupon-figure{margin:0 auto;max-width:700px}
+.coupon-figure img{display:block;width:100%;height:auto;border:1px solid #e2ded9;border-radius:12px}
+.coupon-figure figcaption{font-size:13px;color:#525d55;margin:10px 0 18px}
+.coupon-controls{max-width:700px;margin-inline:auto;display:grid;gap:10px}
+.coupon-controls>.clue{border-radius:8px}
+.coupon-controls>.branch-button{justify-self:start}

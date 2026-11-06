@@ -10,6 +10,7 @@ html=html.replace('href="/workshop.css"',`href="${base}/workshop.css"`);
 const version=createHash('sha256').update((await Promise.all(['app.js','scenarios.js','styles.css','workshop.css','campus3d.js'].map(name=>readFile(name,'utf8')))).join('')).digest('hex').slice(0,12);
 await cp('vendor','dist/vendor',{recursive:true});
 await copyFile('campus3d.js','dist/campus3d.js');
+await copyFile('chick-fil-a-coupon.png','dist/chick-fil-a-coupon.png');
 for(const name of ['app.js','scenarios.js','styles.css','workshop.css'])await copyFile(name,`dist/${name}`);
 await writeFile('dist/app.js',(await readFile('app.js','utf8')).replace("'./campus3d.js'",`'./campus3d.js?v=${version}'`).replace("'./scenarios.js'",`'./scenarios.js?v=${version}'`));
 html=html.replaceAll('/styles.css"',`/styles.css?v=${version}"`).replaceAll('/workshop.css"',`/workshop.css?v=${version}"`).replaceAll('/app.js"',`/app.js?v=${version}"`);
