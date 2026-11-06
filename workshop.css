@@ -98,3 +98,46 @@ main.challenge-main:has(.college-mail-layout){
   main.challenge-main,main.challenge-main:has(.college-mail-layout){width:calc(100% - 32px)}
   .artifact .artifact-message p,.artifact .branch-content>p:not(.eyebrow){font-size:15px}
 }
+
+/* Every preview fills the same reading area, including follow-up screens. */
+.challenge-layout>section>.artifact{
+  width:100%;
+  max-width:none;
+  margin-inline:0;
+  --preview-padding:clamp(16px,3vw,32px);
+}
+.artifact .artifact-message h2,.artifact .branch-content h2{
+  font-size:clamp(22px,2.4vw,30px);
+  line-height:1.25;
+}
+.artifact .artifact-message p,.artifact .branch-content>p:not(.eyebrow),
+.artifact .branch-content .branch-reply{
+  max-inline-size:68ch;
+  font-size:clamp(15px,1.4vw,17px);
+  line-height:1.6;
+}
+.artifact .teams-bar,.artifact .teams-navigation,.artifact .authenticator-bar,
+.artifact .phone-top,.artifact .browser-chrome,.artifact .college-mail-header{
+  padding-inline:var(--preview-padding);
+  font-size:14px;
+}
+.artifact .text-bubble,.artifact .dm-bubble{
+  margin-inline:var(--preview-padding);
+  padding-inline:clamp(14px,2vw,24px);
+}
+.artifact .authenticator-screen,.artifact .branch-content,.artifact .flyer{
+  padding:var(--preview-padding);
+}
+.artifact .branch-login .branch-content{max-width:none}
+.artifact .login-sheet{
+  margin:var(--preview-padding);
+  padding:var(--preview-padding);
+}
+.artifact .clue summary,.artifact .branch-button,.artifact .notification-actions button,
+.artifact .preview-control,.artifact .sample-field{font-size:14px;min-height:44px}
+.artifact .branch-button,.artifact .clue summary,.artifact .sample-field{overflow-wrap:anywhere}
+.artifact .branch-actions{flex-wrap:wrap}
+@media(max-width:480px){
+  .artifact .college-mail-header{font-size:12px;padding-inline:10px;gap:8px}
+  .artifact .college-mail-header .mail-search{display:none}
+}
