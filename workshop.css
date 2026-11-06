@@ -60,3 +60,41 @@ header{border-bottom:1px solid #23334f18}.brand-icon{background:var(--campus-cor
 @media(max-width:700px){.mission-guide{display:block;margin:12px 0 18px;padding:14px}.mission-guide .button{width:100%;margin-top:12px}.mission-guide strong{font-size:1.08rem}}
 
 .clue-continue{display:none}.guide-target[open] .clue-continue{display:inline-block;margin:0 12px 14px;padding:9px 12px;min-height:44px;border:1px solid #426e49;border-radius:8px;background:#eef7e8;color:#173924;font:inherit;font-weight:750;cursor:pointer}
+
+/* Give the simulation room to read before asking for a decision. */
+main.challenge-main,
+main.challenge-main:has(.college-mail-layout){
+  width:min(1480px,calc(100% - 64px));
+  max-width:none;
+  margin-inline:auto;
+}
+.challenge-layout,
+.challenge-layout:has(.college-mail-layout){
+  grid-template-columns:minmax(0,1fr) minmax(300px,340px);
+  gap:clamp(24px,3vw,44px);
+}
+.challenge-layout>section{min-width:0}
+.artifact.sms,.artifact.mfa{max-width:620px;margin-inline:auto}
+.artifact .artifact-message p,.artifact .branch-content>p:not(.eyebrow){font-size:16px}
+.artifact .clue summary{font-size:14px}
+.artifact .clue p,.artifact .clue summary .hover-card{font-size:14px}
+.artifact .imessage-header .clue summary{font-size:13px}
+.mail-reading .artifact-message h2{font-size:clamp(21px,2vw,27px)}
+.mail-reading .email-toolbar button{font-size:13px;min-height:44px}
+@media(min-width:850px){
+  .college-mail-layout{grid-template-columns:112px clamp(160px,15vw,210px) minmax(0,1fr);min-height:460px}
+  .college-mail-layout .mail-list,.college-mail-layout .mail-folders{display:flex;flex-direction:column}
+  .college-mail-layout .mobile-mail-switch{display:none}
+  .mail-folders,.mail-folders>b,.mail-row{font-size:11px}
+  .mail-row small{font-size:10px}
+  .mail-list-title{font-size:13px}
+  .mail-reading .artifact-message{padding:24px}
+}
+@media(max-width:1149px){
+  .challenge-layout,.challenge-layout:has(.college-mail-layout){display:block}
+  .challenge-layout>.decision-panel{margin-top:28px}
+}
+@media(max-width:650px){
+  main.challenge-main,main.challenge-main:has(.college-mail-layout){width:calc(100% - 32px)}
+  .artifact .artifact-message p,.artifact .branch-content>p:not(.eyebrow){font-size:15px}
+}
