@@ -141,3 +141,30 @@ main.challenge-main:has(.college-mail-layout){
   .artifact .college-mail-header{font-size:12px;padding-inline:10px;gap:8px}
   .artifact .college-mail-header .mail-search{display:none}
 }
+
+/* Read the preview first, then make the decision in the next row. */
+main.challenge-main,
+main.challenge-main:has(.college-mail-layout){
+  width:min(1120px,calc(100% - clamp(32px,6vw,80px)));
+}
+.challenge-main .challenge-layout{
+  display:block;
+}
+.challenge-main .challenge-layout>.decision-panel{
+  width:min(100%,680px);
+  margin:clamp(24px,4vw,48px) auto 0;
+  padding:clamp(18px,3vw,30px);
+  border:1px solid #d5ddd1;
+  border-radius:16px;
+  background:#fffdf7;
+}
+.challenge-main .decision-panel .choices{
+  margin-block:18px;
+}
+.challenge-main .decision-panel .choice{
+  min-height:52px;
+}
+.challenge-main .decision-panel .button:focus-visible,
+.challenge-main .decision-panel h2:focus-visible{
+  outline-offset:4px;
+}
