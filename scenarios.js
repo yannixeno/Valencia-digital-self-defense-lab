@@ -54,6 +54,7 @@ lunch.sender='Lisa';
 lunch.headline='Free meal for two';
 lunch.label='FORWARDED MEAL COUPON';
 lunch.clue='Lisa forwarded the link. The preview does not say where it originally came from.';
+lunch.actions[0]=['Check the official restaurant app',true,'In this simulation, the official app has no matching offer. Checking independently avoids handing account details to the forwarded site.'];
 lunch.question='How could you check whether the coupon is real without using the forwarded link?';
 lunch.check=['Check the dates printed on the coupon','Preview where the forwarded link goes','Check the offer in the official restaurant app'];
 lunch.flags=[['The date has passed','The coupon was valid May 1–30, 2020. A forwarded copy doesn’t make it current.'],['An unfamiliar address','The link points to valencia-meals.example. The name and logo in the preview don’t verify the website.'],['Forwarded by a friend','Lisa passed the message along. That doesn’t tell you who created the offer.']];
@@ -88,11 +89,12 @@ const interactions={
  'qr-free-food':{
   start:'initial',facilitator:{points:'Claim the meal; inspect the promotion; continue to a sign-in preview or stop.',unsafe:'A tempting offer escalates into a college-password request at an unrelated address.',safe:'Stop and check the offer with Student Development without using the forwarded link.',question:'At which step did the lunch offer start asking for more than you expected?'},
   steps:{
-   initial:{view:'original',title:'Try the lunch offer',actions:[branchAction('claim','Open offer · simulation only','promotion','cta'),branchAction('staff','Ask Student Development instead','verified','extra')]},
+   initial:{view:'original',title:'Try the lunch offer',actions:[branchAction('claim','Open offer · simulation only','promotion','cta'),branchAction('official-app','Check the official app · simulation','official-app','extra'),branchAction('staff','Ask Student Development instead','verified','extra')]},
    promotion:{view:'page',title:'Your free meal is waiting',body:'Verify that you are a Valencia student to reserve your meal. College sign-in is required.',domain:'valencia-meals.example',actions:[branchAction('continue','Continue with college account','login'),branchAction('stop','Stop and check with Student Development','verified'),branchAction('back','Back to the forwarded coupon','initial')]},
    login:{view:'login',title:'Sign in to claim your meal',body:'This promotion now asks for your college login. These are fixed sample displays, not fields.',domain:'valencia-meals.example',actions:[branchAction('signin','Sign in · sample only','pause'),branchAction('stop','Stop and check the offer with campus staff','verified'),branchAction('back','Back to the promotional page','promotion')]},
    pause:{view:'login',title:'Before entering anything, pause',body:'You were about to enter a college password for a free meal on an unrelated website. No information was entered. Is this a place you trust?',domain:'valencia-meals.example',emphasizeDomain:true,actions:[branchAction('inspect','Inspect the address again','address'),branchAction('stop','Close this preview and ask campus staff','verified')]},
    address:{view:'page',title:'The address belongs to this promotion',body:'The website address tells you where you are. A college logo does not make valencia-meals.example an official college service.',domain:'valencia-meals.example',actions:[branchAction('stop','Check with Student Development independently','verified'),branchAction('back','Back to the login preview','login')]},
+   'official-app':resolution('No matching offer in the sample app','You opened the official app independently in this simulation. No offer matching the forwarded coupon is listed.'),
    verified:resolution('You checked the offer independently','In this fictional exercise, Student Development has no record of this promotion. You stopped before sharing account details and checked with a known campus office.')
   }
  },

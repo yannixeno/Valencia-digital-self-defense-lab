@@ -177,3 +177,11 @@ main.challenge-main:has(.college-mail-layout){
 .coupon-controls{max-width:700px;margin-inline:auto;display:grid;gap:10px}
 .coupon-controls>.clue{border-radius:8px}
 .coupon-controls>.branch-button{justify-self:start}
+
+.coupon-image{position:relative}
+.coupon-tip{max-width:700px;margin:0 auto 12px;color:#345143;font-size:14px}
+.coupon-hotspot{position:absolute;display:grid;place-content:center;min-width:44px;min-height:44px;border:2px solid #31614d;border-radius:8px;background:#e7f5e535;color:#173d2d;font-size:20px;font-weight:800;line-height:1}
+.coupon-hotspot:hover,.coupon-hotspot:focus-visible{background:#e7f5e5cc;outline:3px solid #173d2d;outline-offset:2px}
+.coupon-sender{left:12%;top:4%;width:37%;height:8%;justify-content:end;padding-inline:8px}
+.coupon-date{left:12%;top:55%;width:40%;height:6%;justify-content:end;padding-inline:8px}
+.coupon-link{left:12%;top:71%;width:80%;height:15%;justify-content:end;padding-inline:8px}
